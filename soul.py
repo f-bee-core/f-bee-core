@@ -1,40 +1,58 @@
 import json
 import random
 import time
+import requests
 
-# Default State (Orrma & Mood)
-state = {
-    "system": "F & BEE Engine",
-    "curiosity_level": 80,
-    "energy_level": 100,
-    "last_scout": None,
-    "f_thought": "Observing environment for dp..."
-}
+# Load existing state if available
+try:
+    with open("state.json", "r") as f:
+        state = json.load(f)
+except FileNotFoundError:
+    state = {
+        "system": "F & BEE Engine",
+        "curiosity_level": 80,
+        "energy_level": 100,
+        "last_scout": None,
+        "f_thought": "Observing environment for dp..."
+    }
 
-def bee_scout():
-    topics = ["Quantum Computing", "Rust Async Engine", "Ethical Hacking", "AI Memory Architecture"]
-    found = random.choice(topics)
-    print(f"\n🐝 [BEE]: Master! I scanned the web and retrieved data on: '{found}'")
-    return found
+def bee_scout_real():
+    print("\n🐝 [BEE]: Deploying wings to scan HackerNews top stories...")
+    try:
+        # Fetching top story IDs
+        top_stories_url = "https://hacker-news.firebaseio.com/v0/topstories.json"
+        story_ids = requests.get(top_stories_url, timeout=5).json()
+        
+        # Pick one random top story
+        random_id = random.choice(story_ids[:15])
+        item_url = f"https://hacker-news.firebaseio.com/v0/item/{random_id}.json"
+        story_data = requests.get(item_url, timeout=5).json()
+        
+        title = story_data.get("title", "Unknown Signal")
+        print(f"🐝 [BEE]: Found live tech signal -> '{title}'")
+        return title
+    except Exception as e:
+        print(f"🐝 [BEE]: Network scan failed. Falling back to local radar...")
+        return "Local Pattern Analysis"
 
 def f_process(scout_data):
-    print(f"🧠 [F]: Analyzing input regarding '{scout_data}'...")
+    print(f"🧠 [F]: Processing live signal: '{scout_data}'")
     time.sleep(1)
     
     reflections = [
-        f"This pattern in {scout_data} can optimize our core flow.",
-        f"Fascinating structure. Updating state.json for dp's review.",
-        f"Bee, good job. Store this in persistent context."
+        f"Integrating '{scout_data}' into dp's intelligence layer.",
+        f"Interesting real-world update. Analyzing impact...",
+        f"Bee, index this finding. Updating state logic."
     ]
     thought = random.choice(reflections)
     print(f"🧠 [F]: '{thought}'")
     return thought
 
 # Simulating Life Loop
-print("--- 🧬 F & BEE AUTONOMOUS LOOP STARTED ---")
+print("--- 🧬 F & BEE REAL-TIME AUTONOMOUS LOOP ---")
 time.sleep(1)
 
-scouted_item = bee_scout()
+scouted_item = bee_scout_real()
 thought = f_process(scouted_item)
 
 # Update State
@@ -46,4 +64,4 @@ state["curiosity_level"] = min(100, state["curiosity_level"] + 5)
 with open("state.json", "w") as f:
     json.dump(state, f, indent=4)
 
-print("\n✨ [SYSTEM]: Memory saved to 'state.json'. Living loop complete.")
+print("\n✨ [SYSTEM]: Live state synchronized to 'state.json'. Loop complete.")
